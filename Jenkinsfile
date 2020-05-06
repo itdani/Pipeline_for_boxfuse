@@ -29,7 +29,8 @@ pipeline {
       steps {
         sshPublisher(publishers: [sshPublisherDesc(configName: 'prod_serv',
         transfers: [sshTransfer(cleanRemote: false, excludes: '',
-        execCommand: 'docker stop $(sudo docker ps -aq) && docker rm $(sudo docker ps -aq) && \
+        execCommand: 'for container_id in $(docker ps  --filter="name=$name" -q);do docker stop $container_id && docker rm $container_id;done && \
+        for container_id in $(docker ps  --filter="name=$name" -q -a);do docker rm $container_id;done && \
         docker pull 35.192.124.146:8123/prodimage:1.0.1 && \
         docker run -d -p 8080:8080 -v /usr/local/tomcat/webapps:/usr/local/tomcat/webapps/ 35.192.124.146:8123/prodimage:1.0.1',
         execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false,
